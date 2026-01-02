@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #include "atomic.h"
  
 uintptr_t __stack_chk_guard;
