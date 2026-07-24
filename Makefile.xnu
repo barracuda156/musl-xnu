@@ -119,7 +119,7 @@ obj/%.o: $(srcdir)/%.s
 obj/%.o: $(srcdir)/%.S
 	$(CC_CMD)
 
-obj/%.o: $(srcdir)/%.c $(GENH)
+obj/%.o: $(srcdir)/%.c $(GENH) $(IMPH)
 	$(CC_CMD)
 
 lib/libc.a: $(AOBJS)
