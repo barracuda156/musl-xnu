@@ -48,15 +48,19 @@ void __init_libc(char **envp, char *pn)
 
 uintptr_t __apple_stack_guard(char **applep)
 {
-	uintptr_t entropy = 0;
 	while (*applep != 0) {
 		if (strncmp(*applep, "stack_guard=0x", 14) == 0) {
-			entropy = strtoull(*applep + 14, NULL, 16);
-			return entropy;
+			return strtoull(*applep + 14, NULL, 16);
 		}
 		applep++;
 	}
-	abort();
+	/* "stack_guard=" was added to the kernel's apple-vector in Lion
+	 * (xnu-1699). On Leopard/Snow Leopard (pre-Lion Intel Darwin,
+	 * still valid deployment targets for this port) the key is
+	 * absent too, so treat its absence as expected rather than an
+	 * error. Fall back to the entropy source already used for ASLR
+	 * (__arch_entropy) rather than aborting every program on startup. */
+	return __arch_entropy();
 }
 
 int __libc_start_main(int (*main)(int,char **,char **,char **), int argc, char **argv)
