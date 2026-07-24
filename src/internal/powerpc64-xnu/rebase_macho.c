@@ -50,7 +50,7 @@ void __rebase_macho(uintptr_t image_base, intptr_t slide)
 	struct relocation_info* reloc_end = &reloc_start[dynsymtab->nlocrel];
 	for (struct relocation_info* reloc = reloc_start; reloc < reloc_end; ++reloc) {
 		if (reloc->r_length != 3) abort();
-		if (reloc->r_type != X86_64_RELOC_UNSIGNED) abort();
+		if (reloc->r_type != PPC_RELOC_VANILLA) abort();
 		*((uintptr_t*)(reloc->r_address + reloc_base)) += slide;
 	}
 }
