@@ -74,6 +74,12 @@ WRAPCC_CLANG = clang
 
 LDSO_PATHNAME = $(syslibdir)/ld-musl-$(ARCH)$(SUBARCH).so.1
 
+# Support both DESTDIR (standard) and DESTROOT (MacPorts/Darwin)
+# DESTROOT takes precedence if both are set
+ifdef DESTROOT
+DESTDIR = $(DESTROOT)
+endif
+
 -include config.mak
 
 ifeq ($(ARCH),)
@@ -194,36 +200,58 @@ obj/%-clang: $(srcdir)/tools/%-clang.in config.mak
 	chmod +x $@
 
 $(DESTDIR)$(bindir)/%: obj/%
+	mkdir -p $(dir $@)
 	$(INSTALL) -D $< $@
 
 $(DESTDIR)$(libdir)/%.so: lib/%.so
+	mkdir -p $(dir $@)
 	$(INSTALL) -D -m 755 $< $@
 
 $(DESTDIR)$(libdir)/%: lib/%
+	mkdir -p $(dir $@)
 	$(INSTALL) -D -m 644 $< $@
 
 $(DESTDIR)$(includedir)/bits/%: $(srcdir)/arch/$(ARCH)/bits/%
+	mkdir -p $(dir $@)
 	$(INSTALL) -D -m 644 $< $@
 
 $(DESTDIR)$(includedir)/bits/%: $(srcdir)/arch/generic/bits/%
+	mkdir -p $(dir $@)
 	$(INSTALL) -D -m 644 $< $@
 
 $(DESTDIR)$(includedir)/bits/%: obj/include/bits/%
+	mkdir -p $(dir $@)
 	$(INSTALL) -D -m 644 $< $@
 
 $(DESTDIR)$(includedir)/%: $(srcdir)/include/%
+	mkdir -p $(dir $@)
 	$(INSTALL) -D -m 644 $< $@
 
 $(DESTDIR)$(LDSO_PATHNAME): $(DESTDIR)$(libdir)/libc.so
+	mkdir -p $(dir $@)
 	$(INSTALL) -D -l $(libdir)/libc.so $@ || true
 
 install-libs: $(ALL_LIBS:lib/%=$(DESTDIR)$(libdir)/%) $(if $(SHARED_LIBS),$(DESTDIR)$(LDSO_PATHNAME),)
+	@echo "Installed libraries to: $(DESTDIR)$(libdir)"
 
 install-headers: $(ALL_INCLUDES:include/%=$(DESTDIR)$(includedir)/%)
+	@echo "Installed headers to: $(DESTDIR)$(includedir)"
 
 install-tools: $(ALL_TOOLS:obj/%=$(DESTDIR)$(bindir)/%)
+	@echo "Installed tools to: $(DESTDIR)$(bindir)"
 
 install: install-libs install-headers install-tools
+	@echo ""
+	@echo "Installation complete!"
+	@echo "  Libraries: $(DESTDIR)$(libdir)"
+	@echo "  Headers:   $(DESTDIR)$(includedir)"
+	@echo "  Tools:     $(DESTDIR)$(bindir)"
+	@echo ""
+	@if [ -n "$(DESTDIR)" ]; then \
+		echo "Note: Files installed to staging directory: $(DESTDIR)"; \
+		echo "      Move them to final location if needed."; \
+		echo ""; \
+	fi
 
 musl-git-%.tar.gz: .git
 	 git --git-dir=$(srcdir)/.git archive --format=tar.gz --prefix=$(patsubst %.tar.gz,%,$@)/ -o $@ $(patsubst musl-git-%.tar.gz,%,$@)

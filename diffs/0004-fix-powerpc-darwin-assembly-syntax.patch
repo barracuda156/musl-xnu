@@ -1,0 +1,59 @@
+--- /tmp/powerpc-xnu-crt_arch.h.old	2026-03-19 14:05:10.868333652 +0000
++++ arch/powerpc-xnu/crt_arch.h	2026-03-19 14:04:14.293894347 +0000
+@@ -20,15 +20,15 @@
+ ".align 2\n"
+ ".globl _start\n"
+ "_start:\n"
+-"	li 31, 0\n"              /* Clear frame pointer */
+-"	stwu 1, -16(1)\n"        /* Align stack to 16 bytes */
+-"	mr 3, 1\n"               /* Pass stack pointer as arg */
+-"	addis 4, 0, ha16(___image_base)\n"
+-"	lwz 4, lo16(___image_base)(4)\n"  /* Load image base */
+-"	addis 5, 0, ha16(_start)\n"
+-"	addi 5, 5, lo16(_start)\n"        /* Get start address */
+-"	addis 6, 0, ha16(___start_static)\n"
+-"	lwz 6, lo16(___start_static)(6)\n"
+-"	subf 5, 6, 5\n"                    /* Calculate slide */
++"	li r31,0\n"              /* Clear frame pointer */
++"	stwu r1,-16(r1)\n"       /* Align stack to 16 bytes */
++"	mr r3,r1\n"              /* Pass stack pointer as arg */
++"	addis r4,0,ha16(___image_base)\n"
++"	lwz r4,lo16(___image_base)(r4)\n"  /* Load image base */
++"	addis r5,0,ha16(_start)\n"
++"	addi r5,r5,lo16(_start)\n"         /* Get start address */
++"	addis r6,0,ha16(___start_static)\n"
++"	lwz r6,lo16(___start_static)(r6)\n"
++"	subf r5,r6,r5\n"                    /* Calculate slide */
+ "	bl ___start_c\n"
+ );
+--- /tmp/powerpc64-xnu-crt_arch.h.old	2026-03-19 14:05:11.584351870 +0000
++++ arch/powerpc64-xnu/crt_arch.h	2026-03-19 14:04:27.556231721 +0000
+@@ -20,17 +20,17 @@
+ ".align 3\n"
+ ".globl _start\n"
+ "_start:\n"
+-"	li 31, 0\n"              /* Clear frame pointer */
+-"	stdu 1, -32(1)\n"        /* Align stack to 16 bytes */
+-"	mr 3, 1\n"               /* Pass stack pointer as arg */
+-"	ld 4, ___image_base@got(2)\n"  /* Load image base (TOC-relative) */
+-"	addis 5, 0, _start@highest\n"
+-"	ori 5, 5, _start@higher\n"
+-"	rldicr 5, 5, 32, 31\n"
+-"	oris 5, 5, _start@h\n"
+-"	ori 5, 5, _start@l\n"    /* Get start address */
+-"	ld 6, ___start_static@got(2)\n"
+-"	subf 5, 6, 5\n"          /* Calculate slide */
++"	li r31,0\n"              /* Clear frame pointer */
++"	stdu r1,-32(r1)\n"       /* Align stack to 16 bytes */
++"	mr r3,r1\n"              /* Pass stack pointer as arg */
++"	ld r4,___image_base@got(r2)\n"  /* Load image base (TOC-relative) */
++"	addis r5,0,_start@highest\n"
++"	ori r5,r5,_start@higher\n"
++"	rldicr r5,r5,32,31\n"
++"	oris r5,r5,_start@h\n"
++"	ori r5,r5,_start@l\n"    /* Get start address */
++"	ld r6,___start_static@got(r2)\n"
++"	subf r5,r6,r5\n"         /* Calculate slide */
+ "	bl ___start_c\n"
+ "	nop\n"
+ );

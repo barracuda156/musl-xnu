@@ -331,6 +331,16 @@ unknown) fail "$0: unable to detect target arch; try $0 --target=..." ;;
 esac
 
 #
+# Detect Darwin/XNU and append -xnu suffix to ARCH
+#
+case "$target" in
+*-apple-darwin*|*-apple-macos*)
+printf "Darwin/XNU target detected, using %s-xnu\n" "$ARCH"
+ARCH="$ARCH-xnu"
+;;
+esac
+
+#
 # Try to get a conforming C99 freestanding environment
 #
 tryflag CFLAGS_C99FSE -std=c99

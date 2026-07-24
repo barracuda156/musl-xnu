@@ -2,13 +2,24 @@
 # Makefile for musl-xnu
 #
 
-ARCH = x86_64-xnu
-
 srcdir = .
 
 prefix = /usr
 includedir = $(prefix)/include
 libdir = $(prefix)/lib
+
+# Support both DESTDIR (standard) and DESTROOT (MacPorts)
+# DESTROOT takes precedence if both are set
+ifdef DESTROOT
+DESTDIR = $(DESTROOT)
+endif
+
+-include config.mak
+
+# Default to x86_64-xnu if ARCH not set
+ifeq ($(ARCH),)
+ARCH = x86_64-xnu
+endif
 
 SRC_DIRS = $(addprefix $(srcdir)/,src/* crt example)
 BASE_GLOBS = $(addsuffix /*.c,$(SRC_DIRS))
@@ -116,25 +127,42 @@ lib/%.o: obj/crt/%.o
 	cp $< $@
 
 $(DESTDIR)$(libdir)/%: lib/%
+	mkdir -p $(dir $@)
 	$(INSTALL) -D -m 644 $< $@
 
 $(DESTDIR)$(includedir)/bits/%: $(srcdir)/arch/$(ARCH)/bits/%
+	mkdir -p $(dir $@)
 	$(INSTALL) -D -m 644 $< $@
 
 $(DESTDIR)$(includedir)/bits/%: $(srcdir)/arch/generic/bits/%
+	mkdir -p $(dir $@)
 	$(INSTALL) -D -m 644 $< $@
 
 $(DESTDIR)$(includedir)/bits/%: obj/include/bits/%
+	mkdir -p $(dir $@)
 	$(INSTALL) -D -m 644 $< $@
 
 $(DESTDIR)$(includedir)/%: $(srcdir)/include/%
+	mkdir -p $(dir $@)
 	$(INSTALL) -D -m 644 $< $@
 
 install-libs: $(ALL_LIBS:lib/%=$(DESTDIR)$(libdir)/%)
+	@echo "Installed libraries to: $(DESTDIR)$(libdir)"
 
 install-headers: $(ALL_INCLUDES:include/%=$(DESTDIR)$(includedir)/%)
+	@echo "Installed headers to: $(DESTDIR)$(includedir)"
 
 install: install-libs install-headers
+	@echo ""
+	@echo "Installation complete!"
+	@echo "  Libraries: $(DESTDIR)$(libdir)"
+	@echo "  Headers:   $(DESTDIR)$(includedir)"
+	@echo ""
+	@if [ -n "$(DESTDIR)" ]; then \
+		echo "Note: Files installed to staging directory: $(DESTDIR)"; \
+		echo "      Move them to final location if needed."; \
+		echo ""; \
+	fi
 
 kiwi-git-%.tar.gz: .git
 	 git --git-dir=$(srcdir)/.git archive --format=tar.gz --prefix=$(patsubst %.tar.gz,%,$@)/ -o $@ $(patsubst kiwi-git-%.tar.gz,%,$@)

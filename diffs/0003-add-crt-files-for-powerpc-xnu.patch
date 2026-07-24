@@ -1,0 +1,12 @@
+diff --git a/crt/powerpc-xnu/crti.s b/crt/powerpc-xnu/crti.s
+new file mode 100644
+index 00000000..e69de29b
+diff --git a/crt/powerpc-xnu/crtn.s b/crt/powerpc-xnu/crtn.s
+new file mode 100644
+index 00000000..e69de29b
+diff --git a/crt/powerpc64-xnu/crti.s b/crt/powerpc64-xnu/crti.s
+new file mode 100644
+index 00000000..e69de29b
+diff --git a/crt/powerpc64-xnu/crtn.s b/crt/powerpc64-xnu/crtn.s
+new file mode 100644
+index 00000000..e69de29b
