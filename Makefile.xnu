@@ -45,7 +45,8 @@ LDFLAGS_AUTO =
 LIBCC = -lgcc
 CPPFLAGS =
 CFLAGS = -Wall -Wpointer-arith -Wno-cast-align -Wno-parentheses -Wno-char-subscripts -Wno-uninitialized -Wno-sequence-point -Wno-missing-braces -Wno-unused-value -Wno-unused-function -Wno-overflow -Wno-int-to-pointer-cast
-CFLAGS_AUTO = -Os -fpie -pipe
+# Using -Os leaves _madvise undefined in madvise.o
+CFLAGS_AUTO = -fpie -pipe
 CFLAGS_C99FSE = -std=c99 -ffreestanding -nostdinc
 
 CFLAGS_ALL = $(CFLAGS_C99FSE)
