@@ -4,7 +4,7 @@
 
 srcdir = .
 
-prefix = /usr
+prefix = /opt/local/musl
 includedir = $(prefix)/include
 libdir = $(prefix)/lib
 
@@ -56,7 +56,13 @@ LDFLAGS_ALL = $(LDFLAGS_AUTO) $(LDFLAGS)
 
 AR      = $(CROSS_COMPILE)ar
 RANLIB  = $(CROSS_COMPILE)ranlib
-INSTALL = $(srcdir)/tools/install.sh
+
+# Always use musl's own install script for the -D flag it relies on below.
+# Do NOT name this variable INSTALL: packaging systems (e.g. MacPorts)
+# commonly pass INSTALL=/path/to/system/install on the make command line,
+# which would silently override a plain '=' assignment here and break
+# these rules (system install(1) rejects -D).
+MUSL_INSTALL = $(srcdir)/tools/install.sh
 
 ARCH_INCLUDES = $(wildcard $(srcdir)/arch/$(ARCH)/bits/*.h)
 GENERIC_INCLUDES = $(wildcard $(srcdir)/arch/generic/bits/*.h)
@@ -128,23 +134,23 @@ lib/%.o: obj/crt/%.o
 
 $(DESTDIR)$(libdir)/%: lib/%
 	mkdir -p $(dir $@)
-	$(INSTALL) -D -m 644 $< $@
+	$(MUSL_INSTALL) -D -m 644 $< $@
 
 $(DESTDIR)$(includedir)/bits/%: $(srcdir)/arch/$(ARCH)/bits/%
 	mkdir -p $(dir $@)
-	$(INSTALL) -D -m 644 $< $@
+	$(MUSL_INSTALL) -D -m 644 $< $@
 
 $(DESTDIR)$(includedir)/bits/%: $(srcdir)/arch/generic/bits/%
 	mkdir -p $(dir $@)
-	$(INSTALL) -D -m 644 $< $@
+	$(MUSL_INSTALL) -D -m 644 $< $@
 
 $(DESTDIR)$(includedir)/bits/%: obj/include/bits/%
 	mkdir -p $(dir $@)
-	$(INSTALL) -D -m 644 $< $@
+	$(MUSL_INSTALL) -D -m 644 $< $@
 
 $(DESTDIR)$(includedir)/%: $(srcdir)/include/%
 	mkdir -p $(dir $@)
-	$(INSTALL) -D -m 644 $< $@
+	$(MUSL_INSTALL) -D -m 644 $< $@
 
 install-libs: $(ALL_LIBS:lib/%=$(DESTDIR)$(libdir)/%)
 	@echo "Installed libraries to: $(DESTDIR)$(libdir)"
